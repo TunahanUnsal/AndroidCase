@@ -1,15 +1,12 @@
 package com.scorp.case1.ViewModel
 
-import android.util.Log
+
 import com.scorp.case1.Model.DataSource
 import com.scorp.case1.Model.FetchCompletionHandler
-
 import com.scorp.case1.Model.Person
-import com.scorp.case1.View.MainActivity
-import com.scorp.case1.databinding.ActivityMainBinding
+
 
 class Controller {
-
 
 
     companion object {
@@ -17,16 +14,15 @@ class Controller {
         lateinit var listUpdater : ListUpdater
         lateinit var fetchCompletionHandler : FetchCompletionHandler
         lateinit var  list : List<Person>
+        private var TAG : String = Controller::class.simpleName.toString()
 
 
         fun executeFetch() {
 
 
-            list = listOf<Person>()
+            list = listOf()
 
-
-
-            val fetchCompletionHandler: FetchCompletionHandler = {response, error ->
+            fetchCompletionHandler = {response, error ->
 
 
                 if (response != null) {
@@ -40,8 +36,6 @@ class Controller {
             val datasource = DataSource()
 
             datasource.fetch(null,fetchCompletionHandler)
-
-
 
 
         }

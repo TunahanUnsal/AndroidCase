@@ -1,6 +1,7 @@
 package com.scorp.case1.Model
 import android.os.Handler
 import android.os.Looper
+import com.scorp.case1.View.MainActivity
 import kotlin.collections.ArrayList
 import kotlin.math.min
 import kotlin.random.Random
@@ -17,6 +18,9 @@ typealias FetchCompletionHandler = (FetchResponse?, FetchError?) -> Unit
 private data class ProcessResult(val fetchResponse: FetchResponse?, val fetchError: FetchError?, val waitTime: Double)
 
 class DataSource {
+
+    private var TAG : String = DataSource::class.simpleName.toString()
+
     companion object {
         private var people: List<Person> = listOf()
     }
