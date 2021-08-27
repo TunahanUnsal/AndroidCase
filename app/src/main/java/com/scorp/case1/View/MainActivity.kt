@@ -2,20 +2,19 @@ package com.scorp.case1.View
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.View
-import androidx.core.view.size
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.scorp.case1.Model.Person
 import com.scorp.case1.ViewModel.Controller
-import com.scorp.case1.ViewModel.Controller.Companion.getPeople
+import com.scorp.case1.ViewModel.ListUpdater
 import com.scorp.case1.ViewModel.PersonAdapter
 import com.scorp.case1.databinding.ActivityMainBinding
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ListUpdater {
 
     private lateinit var binding: ActivityMainBinding
     private var TAG : String = MainActivity::class.simpleName.toString()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,30 +23,29 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         listeners()
-        recyclerViewAdapter()
 
-        Controller.executeFetch()
+        Controller.executeFetch()  //TODO
 
 
     }
     private fun listeners(){
+        
+        Controller.registerListUpdater(this)
+
 
     }
-    private fun recyclerViewAdapter(){
+    private fun recyclerViewAdapter(list: List<Person>){
 
         binding.personList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        binding.personList.adapter = PersonAdapter(getPeople())
-
-        if(getPeople().isEmpty()){   //TODO
-
-
-            Log.d(TAG, "recyclerViewAdapter: asdasdasd"+binding.personList.size)
-            binding.emptyText.visibility = View.VISIBLE
-
-
-        }
-
+        binding.personList.adapter = PersonAdapter(list)
 
     }
+
+    override fun listUpdate(list: List<Person>) {
+
+        recyclerViewAdapter(list)
+
+    }
+
 
 }

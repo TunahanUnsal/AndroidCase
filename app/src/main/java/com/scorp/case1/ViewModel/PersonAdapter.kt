@@ -39,7 +39,7 @@ class PersonAdapter(private val dataSet: List<Person>) :
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
 
 
-        viewHolder.textViewId.text = dataSet[position].id.toString()
+        viewHolder.textViewId.text = " ("+dataSet[position].id.toString()+") "
         viewHolder.textViewName.text = dataSet[position].fullName
     }
 
