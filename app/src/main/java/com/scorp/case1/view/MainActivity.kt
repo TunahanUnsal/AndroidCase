@@ -11,7 +11,9 @@ import com.scorp.case1.viewModel.Controller
 import com.scorp.case1.viewModel.ListUpdater
 import com.scorp.case1.viewModel.PersonAdapter
 import com.scorp.case1.databinding.ActivityMainBinding
+import com.scorp.case1.model.FetchError
 import com.scorp.case1.viewModel.OnSwipeTouchListener
+import kotlin.math.log
 
 
 class MainActivity : AppCompatActivity(), ListUpdater {
@@ -19,6 +21,7 @@ class MainActivity : AppCompatActivity(), ListUpdater {
     private lateinit var binding: ActivityMainBinding
     private var TAG: String = MainActivity::class.simpleName.toString()
     private lateinit var temp_next: String
+    private lateinit var temp_old: String
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,7 +32,8 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
         listeners()
 
-        Controller.executeFetch(null)  //TODO
+        Controller.executeFetch(null)
+        temp_old = null.toString()
 
 
     }
@@ -42,6 +46,7 @@ class MainActivity : AppCompatActivity(), ListUpdater {
         binding.nextButton.setOnClickListener {
 
             Controller.executeFetch(temp_next)
+            temp_old = temp_next
             binding.progressBar.visibility = View.VISIBLE
 
         }
@@ -50,13 +55,24 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
             override fun onSwipeBottom() {
 
-                Controller.executeFetch(temp_next)
-                binding.progressBar.visibility = View.VISIBLE
-                Log.d(TAG, "onSwipeBottom")
+                if (temp_next!="null"){
+
+                    Controller.executeFetch(temp_next)
+                    binding.progressBar.visibility = View.VISIBLE
+                    Log.d(TAG, "onSwipeBottom")
+                }
 
             }
 
         })
+
+        binding.refreshButton.setOnClickListener {
+
+            Controller.executeFetch(null)
+            binding.progressBar.visibility = View.VISIBLE
+            binding.refreshButton.visibility = View.INVISIBLE
+
+        }
 
 
     }
@@ -71,19 +87,38 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
     }
 
-    override fun listUpdate(list: List<Person>, next: String) {
+    override fun listUpdate(list: List<Person>, next: String,error: String) {
 
-        Log.d(TAG, "listUpdate $next")
+        Log.d(TAG, "listUpdate next -> $next")
+        Log.d(TAG, "listUpdate error -> $error")
 
-        if (next == "null") {
+        val errorCode : Int = Controller.errorCodeWizard(error,next)
 
-            binding.emptyText.visibility = View.VISIBLE
-            recyclerViewAdapter(list)
-        } else {
-            binding.emptyText.visibility = View.INVISIBLE
-            temp_next = next
-            recyclerViewAdapter(list)
+        Log.d(TAG, "listUpdate error code -> $errorCode")
+
+        if (errorCode == 0){
+
+            if (next == "null") {
+                Log.d(TAG, "listUpdate next -> null")
+                binding.emptyText.visibility = View.VISIBLE
+                binding.refreshButton.visibility = View.VISIBLE
+                binding.nextButton.visibility = View.INVISIBLE
+                temp_next = next
+                recyclerViewAdapter(list)
+            } else {
+                Log.d(TAG, "listUpdate next -> !null ")
+                binding.emptyText.visibility = View.INVISIBLE
+                binding.refreshButton.visibility = View.INVISIBLE
+                binding.nextButton.visibility = View.VISIBLE
+                temp_next = next
+                recyclerViewAdapter(list)
+            }
+
+
         }
+
+
+
 
 
     }
