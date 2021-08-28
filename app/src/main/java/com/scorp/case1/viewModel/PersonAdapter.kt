@@ -1,14 +1,12 @@
-package com.scorp.case1.ViewModel
+package com.scorp.case1.viewModel
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.scorp.case1.Model.Person
+import com.scorp.case1.model.Person
 import com.scorp.case1.R
-import com.scorp.case1.View.MainActivity
-import com.scorp.case1.databinding.ActivityMainBinding
 import com.scorp.case1.databinding.PersonListItemBinding
 
 class PersonAdapter(private val dataSet: List<Person>) :

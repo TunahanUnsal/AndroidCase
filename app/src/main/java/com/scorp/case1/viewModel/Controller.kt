@@ -1,9 +1,10 @@
-package com.scorp.case1.ViewModel
+package com.scorp.case1.viewModel
 
 
-import com.scorp.case1.Model.DataSource
-import com.scorp.case1.Model.FetchCompletionHandler
-import com.scorp.case1.Model.Person
+import android.util.Log
+import com.scorp.case1.model.DataSource
+import com.scorp.case1.model.FetchCompletionHandler
+import com.scorp.case1.model.Person
 
 
 class Controller {
@@ -17,7 +18,9 @@ class Controller {
         private var TAG : String = Controller::class.simpleName.toString()
 
 
-        fun executeFetch() {
+        fun executeFetch(tuna: String?) {
+
+            var z = tuna
 
 
             list = listOf()
@@ -25,9 +28,12 @@ class Controller {
             fetchCompletionHandler = {response, error ->
 
 
+                Log.d(TAG, "executeFetch error : $error")
+
                 if (response != null) {
                     list = response.people
-                    listUpdater.listUpdate(list)
+                    z = response.next.toString()
+                    listUpdater.listUpdate(list, z!!)
 
                 }
 

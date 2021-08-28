@@ -1,7 +1,7 @@
-package com.scorp.case1.Model
+package com.scorp.case1.model
 import android.os.Handler
 import android.os.Looper
-import com.scorp.case1.View.MainActivity
+import android.util.Log
 import kotlin.collections.ArrayList
 import kotlin.math.min
 import kotlin.random.Random
@@ -58,6 +58,7 @@ class DataSource {
             newPeople.add(person)
         }
         people = newPeople.shuffled()
+        Log.d(TAG, "people size: ${people.size}")
     }
 
     private fun processRequest(next: String?): ProcessResult {
