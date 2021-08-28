@@ -12,10 +12,10 @@ class Controller {
 
     companion object {
 
-        lateinit var listUpdater : ListUpdater
-        lateinit var fetchCompletionHandler : FetchCompletionHandler
-        lateinit var  list : List<Person>
-        private var TAG : String = Controller::class.simpleName.toString()
+        lateinit var listUpdater: ListUpdater
+        lateinit var fetchCompletionHandler: FetchCompletionHandler
+        lateinit var list: List<Person>
+        private var TAG: String = Controller::class.simpleName.toString()
 
 
         fun executeFetch(tuna: String?) {
@@ -25,7 +25,7 @@ class Controller {
 
             list = listOf()
 
-            fetchCompletionHandler = {response, error ->
+            fetchCompletionHandler = { response, error ->
 
 
                 Log.d(TAG, "executeFetch error : $error")
@@ -41,19 +41,18 @@ class Controller {
 
             val datasource = DataSource()
 
-            datasource.fetch(null,fetchCompletionHandler)
+            datasource.fetch(null, fetchCompletionHandler)
 
 
         }
-        fun registerListUpdater(listUpdate: ListUpdater){
+
+        fun registerListUpdater(listUpdate: ListUpdater) {
 
             listUpdater = listUpdate
 
         }
 
     }
-
-
 
 
 }

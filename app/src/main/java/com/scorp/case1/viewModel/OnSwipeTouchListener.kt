@@ -1,4 +1,4 @@
-package com.scorp.case1.view
+package com.scorp.case1.viewModel
 
 import android.content.Context
 import android.view.GestureDetector
@@ -30,7 +30,12 @@ open class OnSwipeTouchListener(ctx: Context) : View.OnTouchListener {
             return true
         }
 
-        override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+        override fun onFling(
+            e1: MotionEvent,
+            e2: MotionEvent,
+            velocityX: Float,
+            velocityY: Float
+        ): Boolean {
             var result = false
             try {
                 val diffY = e2.y - e1.y

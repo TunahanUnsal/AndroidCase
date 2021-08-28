@@ -11,13 +11,14 @@ import com.scorp.case1.viewModel.Controller
 import com.scorp.case1.viewModel.ListUpdater
 import com.scorp.case1.viewModel.PersonAdapter
 import com.scorp.case1.databinding.ActivityMainBinding
+import com.scorp.case1.viewModel.OnSwipeTouchListener
 
 
 class MainActivity : AppCompatActivity(), ListUpdater {
 
     private lateinit var binding: ActivityMainBinding
-    private var TAG : String = MainActivity::class.simpleName.toString()
-    private lateinit var temp_next : String
+    private var TAG: String = MainActivity::class.simpleName.toString()
+    private lateinit var temp_next: String
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,9 +33,10 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
 
     }
+
     @SuppressLint("ClickableViewAccessibility")
-    private fun listeners(){
-        
+    private fun listeners() {
+
         Controller.registerListUpdater(this)
 
         binding.nextButton.setOnClickListener {
@@ -45,8 +47,6 @@ class MainActivity : AppCompatActivity(), ListUpdater {
         }
 
         binding.personList.setOnTouchListener(object : OnSwipeTouchListener(applicationContext) {
-
-
 
             override fun onSwipeBottom() {
 
@@ -60,30 +60,30 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
 
     }
-    private fun recyclerViewAdapter(list: List<Person>){
 
-        binding.personList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+    private fun recyclerViewAdapter(list: List<Person>) {
+
+        binding.personList.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.personList.adapter = PersonAdapter(list)
 
         binding.progressBar.visibility = View.INVISIBLE
 
     }
 
-    override fun listUpdate(list: List<Person>,next : String) {
+    override fun listUpdate(list: List<Person>, next: String) {
 
         Log.d(TAG, "listUpdate $next")
 
-        if (next=="null"){
+        if (next == "null") {
 
             binding.emptyText.visibility = View.VISIBLE
             recyclerViewAdapter(list)
-        }
-        else{
+        } else {
             binding.emptyText.visibility = View.INVISIBLE
             temp_next = next
             recyclerViewAdapter(list)
         }
-        
 
 
     }

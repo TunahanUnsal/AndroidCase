@@ -13,13 +13,13 @@ class PersonAdapter(private val dataSet: List<Person>) :
     RecyclerView.Adapter<PersonAdapter.ViewHolder>() {
 
     private lateinit var binding: PersonListItemBinding
-    private var TAG : String = PersonAdapter::class.simpleName.toString()
+    private var TAG: String = PersonAdapter::class.simpleName.toString()
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         val textViewId: TextView = view.findViewById(R.id.id)
 
-        val  textViewName : TextView = view.findViewById(R.id.name)
+        val textViewName: TextView = view.findViewById(R.id.name)
 
     }
 
@@ -39,7 +39,7 @@ class PersonAdapter(private val dataSet: List<Person>) :
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
 
 
-        viewHolder.textViewId.text = " ("+dataSet[position].id.toString()+") "
+        viewHolder.textViewId.text = " (" + dataSet[position].id.toString() + ") "
         viewHolder.textViewName.text = dataSet[position].fullName
     }
 
