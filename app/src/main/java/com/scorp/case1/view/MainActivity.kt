@@ -1,5 +1,6 @@
 package com.scorp.case1.view
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -31,6 +32,7 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
 
     }
+    @SuppressLint("ClickableViewAccessibility")
     private fun listeners(){
         
         Controller.registerListUpdater(this)
@@ -38,8 +40,23 @@ class MainActivity : AppCompatActivity(), ListUpdater {
         binding.nextButton.setOnClickListener {
 
             Controller.executeFetch(temp_next)
+            binding.progressBar.visibility = View.VISIBLE
 
         }
+
+        binding.personList.setOnTouchListener(object : OnSwipeTouchListener(applicationContext) {
+
+
+
+            override fun onSwipeBottom() {
+
+                Controller.executeFetch(temp_next)
+                binding.progressBar.visibility = View.VISIBLE
+                Log.d(TAG, "onSwipeBottom")
+
+            }
+
+        })
 
 
     }
@@ -47,6 +64,8 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
         binding.personList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.personList.adapter = PersonAdapter(list)
+
+        binding.progressBar.visibility = View.INVISIBLE
 
     }
 
@@ -60,14 +79,11 @@ class MainActivity : AppCompatActivity(), ListUpdater {
             recyclerViewAdapter(list)
         }
         else{
-
+            binding.emptyText.visibility = View.INVISIBLE
             temp_next = next
             recyclerViewAdapter(list)
         }
         
-
-
-
 
 
     }
