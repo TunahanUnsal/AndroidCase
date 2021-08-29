@@ -1,7 +1,8 @@
 <resources>
-    <string name="app_name">Scorp</string>
-    <string name="sample_name">İsmail</string>
-    <string name="sample_id">(100)</string>
+    <string name="app_name">My Application</string>
+    <string name="sample_name">Tuna</string>
+    <string name="sample_id">(10)</string>
     <string name="no_one_is_here">No one is here!</string>
     <string name="next">Next</string>
+    <string name="todo">TODO</string>
 </resources>

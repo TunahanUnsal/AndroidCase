@@ -11,9 +11,8 @@ import com.scorp.case1.viewModel.Controller
 import com.scorp.case1.viewModel.ListUpdater
 import com.scorp.case1.viewModel.PersonAdapter
 import com.scorp.case1.databinding.ActivityMainBinding
-import com.scorp.case1.model.FetchError
 import com.scorp.case1.viewModel.OnSwipeTouchListener
-import kotlin.math.log
+
 
 
 class MainActivity : AppCompatActivity(), ListUpdater {
@@ -48,6 +47,7 @@ class MainActivity : AppCompatActivity(), ListUpdater {
             Controller.executeFetch(temp_next)
             temp_old = temp_next
             binding.progressBar.visibility = View.VISIBLE
+            binding.nextButton.visibility = View.INVISIBLE
 
         }
 
@@ -55,10 +55,11 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
             override fun onSwipeBottom() {
 
-                if (temp_next!="null"){
+                if (temp_old!="null"){
 
-                    Controller.executeFetch(temp_next)
+                    Controller.executeFetch(temp_old)
                     binding.progressBar.visibility = View.VISIBLE
+                    binding.nextButton.visibility = View.INVISIBLE
                     Log.d(TAG, "onSwipeBottom")
                 }
 
@@ -68,9 +69,12 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
         binding.refreshButton.setOnClickListener {
 
+
             Controller.executeFetch(null)
             binding.progressBar.visibility = View.VISIBLE
             binding.refreshButton.visibility = View.INVISIBLE
+            binding.nextButton.visibility = View.INVISIBLE
+
 
         }
 
@@ -85,6 +89,7 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
         binding.progressBar.visibility = View.INVISIBLE
 
+
     }
 
     override fun listUpdate(list: List<Person>, next: String,error: String) {
@@ -92,20 +97,29 @@ class MainActivity : AppCompatActivity(), ListUpdater {
         Log.d(TAG, "listUpdate next -> $next")
         Log.d(TAG, "listUpdate error -> $error")
 
-        val errorCode : Int = Controller.errorCodeWizard(error,next)
+        val errorCode : Int = Controller.errorCodeWizard(error,temp_old)
 
         Log.d(TAG, "listUpdate error code -> $errorCode")
 
         if (errorCode == 0){
 
-            if (next == "null") {
-                Log.d(TAG, "listUpdate next -> null")
+
+            if(next == "null"&& list.isNotEmpty()){
+
+                //binding.emptyText.visibility = View.VISIBLE
+                binding.refreshButton.visibility = View.VISIBLE
+                binding.nextButton.visibility = View.INVISIBLE
+                recyclerViewAdapter(list)
+            }
+            else if (next == "null" && list.isEmpty()){
+
                 binding.emptyText.visibility = View.VISIBLE
                 binding.refreshButton.visibility = View.VISIBLE
                 binding.nextButton.visibility = View.INVISIBLE
-                temp_next = next
                 recyclerViewAdapter(list)
-            } else {
+            }
+
+            else {
                 Log.d(TAG, "listUpdate next -> !null ")
                 binding.emptyText.visibility = View.INVISIBLE
                 binding.refreshButton.visibility = View.INVISIBLE
@@ -116,10 +130,6 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
 
         }
-
-
-
-
 
     }
 

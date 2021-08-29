@@ -6,11 +6,10 @@ import android.util.Log
 import com.scorp.case1.model.DataSource
 import com.scorp.case1.model.FetchCompletionHandler
 import com.scorp.case1.model.Person
-import java.util.logging.Handler
-import java.util.logging.LogRecord
+import kotlin.math.log
 
 
-class Controller(handler: () -> Unit) {
+class Controller {
 
 
     companion object {
@@ -19,10 +18,14 @@ class Controller(handler: () -> Unit) {
         lateinit var fetchCompletionHandler: FetchCompletionHandler
         lateinit var list: List<Person>
         private var TAG: String = Controller::class.simpleName.toString()
-        private val datasource = DataSource()
+        private lateinit var datasource : DataSource
 
 
         fun executeFetch(next: String?) {
+
+            datasource = DataSource()
+
+
 
             var z = next
             var t : String = "null"
@@ -54,10 +57,16 @@ class Controller(handler: () -> Unit) {
 
             }
 
+            if(z != "null"){
+                Log.d(TAG, "parametre: $next")
+                datasource.fetch(next, fetchCompletionHandler)
 
-
-            datasource.fetch(null, fetchCompletionHandler)
-
+            }else if (z=="null" && t!="null"){
+                datasource.fetch(next, fetchCompletionHandler)
+            }
+            else{
+                datasource.fetch(null, fetchCompletionHandler)
+            }
 
         }
 
@@ -70,6 +79,7 @@ class Controller(handler: () -> Unit) {
         fun errorCodeWizard(error: String,next : String): Int {
 
             Log.d(TAG, "errorCodeWizard error -> $error")
+            Log.d(TAG, "errorCodeWizard next -> $next")
 
             return when (error) {
                 "Internal Server Error" -> {
