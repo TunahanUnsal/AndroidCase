@@ -1,4 +1,4 @@
-package com.scorp.case1.viewModel
+package com.scorp.case1.view.adapter
 
 import android.view.LayoutInflater
 import android.view.View

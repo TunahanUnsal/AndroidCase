@@ -1,4 +1,4 @@
-package com.scorp.case1.view
+package com.scorp.case1.view.activity
 
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.scorp.case1.model.Person
 import com.scorp.case1.viewModel.Controller
 import com.scorp.case1.viewModel.ListUpdater
-import com.scorp.case1.viewModel.PersonAdapter
+import com.scorp.case1.view.adapter.PersonAdapter
 import com.scorp.case1.databinding.ActivityMainBinding
 import com.scorp.case1.viewModel.OnSwipeTouchListener
 
@@ -17,7 +17,7 @@ import com.scorp.case1.viewModel.OnSwipeTouchListener
 
 class MainActivity : AppCompatActivity(), ListUpdater {
 
-    private lateinit var binding: ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding  //view binding
     private var TAG: String = MainActivity::class.simpleName.toString()
     private lateinit var temp_next: String
     private lateinit var temp_old: String
@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
         Controller.registerListUpdater(this)
 
-        binding.nextButton.setOnClickListener {
+        binding.nextButton.setOnClickListener {   //next page
 
             Controller.executeFetch(temp_next)
             temp_old = temp_next
@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
         }
 
-        binding.personList.setOnTouchListener(object : OnSwipeTouchListener(applicationContext) {
+        binding.personList.setOnTouchListener(object : OnSwipeTouchListener(applicationContext) {  //pull to refresh
 
             override fun onSwipeBottom() {
 
@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
         })
 
-        binding.refreshButton.setOnClickListener {
+        binding.refreshButton.setOnClickListener {  //go to first page
 
 
             Controller.executeFetch(null)
@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
     }
 
-    private fun recyclerViewAdapter(list: List<Person>) {
+    private fun recyclerViewAdapter(list: List<Person>) {  //list create or update
 
         binding.personList.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
     }
 
-    override fun listUpdate(list: List<Person>, next: String,error: String) {
+    override fun listUpdate(list: List<Person>, next: String,error: String) { //list update interface
 
         Log.d(TAG, "listUpdate next -> $next")
         Log.d(TAG, "listUpdate error -> $error")

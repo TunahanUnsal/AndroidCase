@@ -21,14 +21,13 @@ class Controller {
         private lateinit var datasource : DataSource
 
 
-        fun executeFetch(next: String?) {
+        fun executeFetch(next: String?) {  //general control function for model
 
             datasource = DataSource()
 
 
-
             var z = next
-            var t : String = "null"
+            var t = "null"
 
             list = listOf()
 
@@ -57,26 +56,26 @@ class Controller {
 
             }
 
-            if(z != "null"){
+            if(z != "null"){  //next page available
                 Log.d(TAG, "parametre: $next")
                 datasource.fetch(next, fetchCompletionHandler)
 
-            }else if (z=="null" && t!="null"){
+            }else if (z=="null" && t!="null"){  //an error occurred
                 datasource.fetch(next, fetchCompletionHandler)
             }
-            else{
+            else{  //first execute
                 datasource.fetch(null, fetchCompletionHandler)
             }
 
         }
 
-        fun registerListUpdater(listUpdate: ListUpdater) {
+        fun registerListUpdater(listUpdate: ListUpdater) {  //register for list update interface
 
             listUpdater = listUpdate
 
         }
 
-        fun errorCodeWizard(error: String,next : String): Int {
+        fun errorCodeWizard(error: String,next : String): Int {  //error handling function
 
             Log.d(TAG, "errorCodeWizard error -> $error")
             Log.d(TAG, "errorCodeWizard next -> $next")
@@ -99,11 +98,11 @@ class Controller {
             }
         }
         @SuppressLint("StaticFieldLeak")
-        private fun retryFetch(next : String) {
+        private fun retryFetch(next : String) {  //retry implementation
 
-            val loadingProducts : ErrorHandler
+            val errorHandler : ErrorHandler
 
-            loadingProducts =
+            errorHandler =
             object : ErrorHandler(next) {
                 override fun onPostExecute(result: String?) {
                     super.onPostExecute(result)
@@ -113,7 +112,7 @@ class Controller {
                 }
             }
 
-            loadingProducts.execute()
+            errorHandler.execute()
 
 
         }
