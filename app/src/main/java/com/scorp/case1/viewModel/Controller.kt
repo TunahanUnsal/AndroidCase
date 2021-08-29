@@ -26,8 +26,8 @@ class Controller {
             datasource = DataSource()
 
 
-            var z = next
-            var t = "null"
+            var tempNext = next
+            var tempError = "null"
 
             list = listOf()
 
@@ -40,27 +40,27 @@ class Controller {
                 if (response != null) {
                     Log.d(TAG, "executeFetch: listUpdated")
                     list = response.people
-                    z = response.next.toString()
+                    tempNext = response.next.toString()
 
-                    t = error?.errorDescription ?: "null"
+                    tempError = error?.errorDescription ?: "null"
 
-                    listUpdater.listUpdate(list, z!!, t)
+                    listUpdater.listUpdate(list, tempNext!!, tempError)
 
                 }
                 else{
-                    t = error?.errorDescription ?: "null"
-                    z = "null"
+                    tempError = error?.errorDescription ?: "null"
+                    tempNext = "null"
                     list = listOf()
-                    listUpdater.listUpdate(list, z!!, t)
+                    listUpdater.listUpdate(list, tempNext!!, tempError)
                 }
 
             }
 
-            if(z != "null"){  //next page available
+            if(tempNext != "null"){  //next page available
                 Log.d(TAG, "parametre: $next")
                 datasource.fetch(next, fetchCompletionHandler)
 
-            }else if (z=="null" && t!="null"){  //an error occurred
+            }else if (tempNext=="null" && tempError!="null"){  //an error occurred
                 datasource.fetch(next, fetchCompletionHandler)
             }
             else{  //first execute
