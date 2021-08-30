@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.core.view.size
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.scorp.case1.model.Person
@@ -17,7 +18,6 @@ import com.scorp.case1.databinding.ActivityMainBinding
 import com.scorp.case1.viewModel.OnSwipeTouchListener
 
 
-
 class MainActivity : AppCompatActivity(), ListUpdater {
 
     private lateinit var binding: ActivityMainBinding  //view binding
@@ -25,8 +25,9 @@ class MainActivity : AppCompatActivity(), ListUpdater {
     private lateinit var tempNext: String
     private lateinit var tempOld: String
     private var people: MutableList<Person> = mutableListOf()
-    var isLastPage: Boolean = false
-    var isLoading: Boolean = false
+    private var isLastPage: Boolean = false
+    private var isLoading: Boolean = false
+    private var visibleItemCount = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,29 +69,24 @@ class MainActivity : AppCompatActivity(), ListUpdater {
     private fun recyclerViewAdapter(list: List<Person>) {  //list create or update
 
 
-
         people.addAll(list)
 
 
-        binding.personList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        binding.personList.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.personList.adapter = PersonAdapter(people)
 
         binding.progressBar.visibility = View.INVISIBLE
         binding.swiperefresh.isRefreshing = false
 
-        Log.d(TAG, "people.size: "+people.size)
-        Log.d(TAG, "list.size: "+list.size)
-
-        if (list.size<=15&&tempNext!="null"){
-            binding.personList.scrollToPosition(people.size-16)
-        }
-        else if(tempNext!="null"){
-            binding.personList.scrollToPosition(people.size-list.size-1)
-        }
+        Log.d(TAG, "people.size: " + people.size)
+        Log.d(TAG, "list.size: " + list.size)
 
 
 
-        binding.personList.addOnScrollListener(object : PaginationScrollListener(binding.personList.layoutManager as LinearLayoutManager) {
+
+        binding.personList.addOnScrollListener(object :
+            PaginationScrollListener(binding.personList.layoutManager as LinearLayoutManager) {
             override fun isLastPage(): Boolean {
                 Log.d(TAG, "isLastPage")
 
@@ -104,7 +100,7 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
             override fun loadMoreItems() {
 
-                if (!isLoading){
+                if (!isLoading) {
                     Log.d(TAG, "loadMoreItems")
                     scrollDown()
                 }
@@ -113,49 +109,43 @@ class MainActivity : AppCompatActivity(), ListUpdater {
         })
 
 
-
-
     }
 
-    override fun listUpdate(list: List<Person>, next: String,error: String) { //list update interface
-
+    override fun listUpdate(                //list update interface
+        list: List<Person>,
+        next: String,
+        error: String
+    ) {                                        
 
 
         Log.d(TAG, "listUpdate next -> $next")
         Log.d(TAG, "listUpdate error -> $error")
 
-        val errorCode : Int = Controller.errorCodeWizard(error,tempOld)
+        val errorCode: Int = Controller.errorCodeWizard(error, tempOld)
 
         Log.d(TAG, "listUpdate error code -> $errorCode")
 
-        if (errorCode == 0){
+        if (errorCode == 0) {
 
-            if(next == "null"&& list.isNotEmpty()){
+            if (next == "null" && list.isNotEmpty()) {
 
                 binding.refreshButton.visibility = View.VISIBLE
                 recyclerViewAdapter(list)
-                Log.d(TAG, "listUpdate: girdiii")
                 isLoading = true
 
 
-            }
-            else if (next == "null" && list.isEmpty()){
+            } else if (next == "null" && list.isEmpty()) {
 
                 binding.emptyText.visibility = View.VISIBLE
                 binding.refreshButton.visibility = View.VISIBLE
-                Log.d(TAG, "listUpdate: girdiii2")
                 recyclerViewAdapter(list)
                 isLoading = false
-            }
+            } else {
 
-            else {
-
-                Log.d(TAG, "listUpdate next -> !null ")
                 binding.emptyText.visibility = View.INVISIBLE
                 binding.refreshButton.visibility = View.INVISIBLE
                 tempNext = next
                 recyclerViewAdapter(list)
-                Log.d(TAG, "listUpdate: girdiii3")
                 isLoading = false
             }
 
@@ -164,7 +154,8 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
 
     }
-    fun scrollDown(){
+
+    private fun scrollDown() {
 
         binding.progressBar.visibility = View.VISIBLE
         Controller.executeFetch(tempNext)
@@ -174,7 +165,8 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
 
     }
-    fun scrollUp(){
+
+    private fun scrollUp() {
 
         binding.progressBar.visibility = View.VISIBLE
         Controller.executeFetch(null)
@@ -183,15 +175,14 @@ class MainActivity : AppCompatActivity(), ListUpdater {
         tempOld = null.toString()
 
     }
-    fun refresh(){
+
+    private fun refresh() {
 
         Controller.executeFetch(null)
         binding.progressBar.visibility = View.VISIBLE
         binding.refreshButton.visibility = View.INVISIBLE
 
     }
-
-
 
 
 }
