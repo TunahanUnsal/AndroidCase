@@ -20,7 +20,9 @@ class MainActivity : AppCompatActivity(), ListUpdater {
     private lateinit var binding: ActivityMainBinding  //view binding
     private var TAG: String = MainActivity::class.simpleName.toString()
     private lateinit var temp_next: String
+    private lateinit var temp_hold: String
     private lateinit var temp_old: String
+    private var flag: Boolean = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +35,9 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
         Controller.executeFetch(null)
         temp_old = null.toString()
+        temp_hold = null.toString()
+        temp_next = null.toString()
+
 
 
     }
@@ -45,11 +50,21 @@ class MainActivity : AppCompatActivity(), ListUpdater {
         binding.nextButton.setOnClickListener {   //next page
 
             Controller.executeFetch(temp_next)
-            temp_old = temp_next
+
             binding.progressBar.visibility = View.VISIBLE
             binding.nextButton.visibility = View.INVISIBLE
+            binding.prevButton.visibility = View.INVISIBLE
 
         }
+        binding.prevButton.setOnClickListener {   //next page
+
+            Controller.executeFetch(temp_old)
+            binding.progressBar.visibility = View.VISIBLE
+            binding.nextButton.visibility = View.INVISIBLE
+            binding.prevButton.visibility = View.INVISIBLE
+
+        }
+
 
         binding.personList.setOnTouchListener(object : OnSwipeTouchListener(applicationContext) {  //pull to refresh
 
@@ -57,9 +72,10 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
                 if (temp_old!="null"){
 
-                    Controller.executeFetch(temp_old)
+                    Controller.executeFetch(temp_hold)
                     binding.progressBar.visibility = View.VISIBLE
                     binding.nextButton.visibility = View.INVISIBLE
+                    binding.prevButton.visibility = View.INVISIBLE
                     Log.d(TAG, "onSwipeBottom")
                 }
 
@@ -74,6 +90,7 @@ class MainActivity : AppCompatActivity(), ListUpdater {
             binding.progressBar.visibility = View.VISIBLE
             binding.refreshButton.visibility = View.INVISIBLE
             binding.nextButton.visibility = View.INVISIBLE
+            binding.prevButton.visibility = View.INVISIBLE
 
 
         }
@@ -109,6 +126,7 @@ class MainActivity : AppCompatActivity(), ListUpdater {
                 //binding.emptyText.visibility = View.VISIBLE
                 binding.refreshButton.visibility = View.VISIBLE
                 binding.nextButton.visibility = View.INVISIBLE
+                binding.prevButton.visibility = View.VISIBLE
                 recyclerViewAdapter(list)
             }
             else if (next == "null" && list.isEmpty()){
@@ -116,16 +134,25 @@ class MainActivity : AppCompatActivity(), ListUpdater {
                 binding.emptyText.visibility = View.VISIBLE
                 binding.refreshButton.visibility = View.VISIBLE
                 binding.nextButton.visibility = View.INVISIBLE
+                binding.prevButton.visibility = View.VISIBLE
                 recyclerViewAdapter(list)
             }
 
             else {
+
                 Log.d(TAG, "listUpdate next -> !null ")
                 binding.emptyText.visibility = View.INVISIBLE
                 binding.refreshButton.visibility = View.INVISIBLE
                 binding.nextButton.visibility = View.VISIBLE
+                if (flag){
+                    binding.prevButton.visibility = View.VISIBLE
+                }
+                temp_old = temp_hold
+                temp_hold = temp_next
                 temp_next = next
+                Log.d(TAG, "listUpdate: $temp_old - $temp_hold - $temp_next")
                 recyclerViewAdapter(list)
+                flag = true
             }
 
 
