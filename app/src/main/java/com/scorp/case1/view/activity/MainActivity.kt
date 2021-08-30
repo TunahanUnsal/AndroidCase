@@ -50,6 +50,12 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
         Controller.registerListUpdater(this)
 
+        binding.swiperefresh.setOnRefreshListener {
+
+            scrollUp()
+
+        }
+
 
         binding.refreshButton.setOnClickListener {
 
@@ -61,7 +67,7 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
     private fun recyclerViewAdapter(list: List<Person>) {  //list create or update
 
-        var tempSize = people.size
+
 
         people.addAll(list)
 
@@ -70,14 +76,15 @@ class MainActivity : AppCompatActivity(), ListUpdater {
         binding.personList.adapter = PersonAdapter(people)
 
         binding.progressBar.visibility = View.INVISIBLE
+        binding.swiperefresh.isRefreshing = false
 
         Log.d(TAG, "people.size: "+people.size)
         Log.d(TAG, "list.size: "+list.size)
 
-        if (list.size<=15){
+        if (list.size<=15&&tempNext!="null"){
             binding.personList.scrollToPosition(people.size-16)
         }
-        else{
+        else if(tempNext!="null"){
             binding.personList.scrollToPosition(people.size-list.size-1)
         }
 
@@ -127,13 +134,18 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
                 binding.refreshButton.visibility = View.VISIBLE
                 recyclerViewAdapter(list)
+                Log.d(TAG, "listUpdate: girdiii")
+                isLoading = true
+
+
             }
             else if (next == "null" && list.isEmpty()){
 
                 binding.emptyText.visibility = View.VISIBLE
                 binding.refreshButton.visibility = View.VISIBLE
-
+                Log.d(TAG, "listUpdate: girdiii2")
                 recyclerViewAdapter(list)
+                isLoading = false
             }
 
             else {
@@ -143,13 +155,14 @@ class MainActivity : AppCompatActivity(), ListUpdater {
                 binding.refreshButton.visibility = View.INVISIBLE
                 tempNext = next
                 recyclerViewAdapter(list)
-
+                Log.d(TAG, "listUpdate: girdiii3")
+                isLoading = false
             }
 
 
         }
 
-        isLoading = false
+
     }
     fun scrollDown(){
 
@@ -165,6 +178,7 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
         binding.progressBar.visibility = View.VISIBLE
         Controller.executeFetch(null)
+        people.clear()
         tempNext = null.toString()
         tempOld = null.toString()
 
@@ -174,6 +188,7 @@ class MainActivity : AppCompatActivity(), ListUpdater {
         Controller.executeFetch(null)
         binding.progressBar.visibility = View.VISIBLE
         binding.refreshButton.visibility = View.INVISIBLE
+
     }
 
 
