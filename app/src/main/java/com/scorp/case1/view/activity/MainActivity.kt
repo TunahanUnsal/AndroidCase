@@ -1,5 +1,6 @@
 package com.scorp.case1.view.activity
 
+import PaginationScrollListener
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -24,7 +25,6 @@ class MainActivity : AppCompatActivity(), ListUpdater {
     private lateinit var tempNext: String
     private lateinit var tempOld: String
     private var people: MutableList<Person> = mutableListOf()
-    private var tuna : Int = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,15 +33,12 @@ class MainActivity : AppCompatActivity(), ListUpdater {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        listeners()
-
         Controller.executeFetch(null)
+
+        listeners()
 
         tempNext = null.toString()
         tempOld = null.toString()
-
-
-
 
 
     }
@@ -52,49 +49,36 @@ class MainActivity : AppCompatActivity(), ListUpdater {
         Controller.registerListUpdater(this)
 
 
-        binding.personList.setOnTouchListener(object : OnSwipeTouchListener(applicationContext) {  //pull to refresh
+        binding.refreshButton.setOnClickListener {
 
-            override fun onSwipeBottom() {
-
-
-
-            }
-
-
-        })
-
-        binding.personList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-
-                if (!recyclerView.canScrollVertically(1) && recyclerView.scrollState==1) {
-                    binding.progressBar.visibility = View.VISIBLE
-                    tuna = recyclerView.scrollState
-                    Controller.executeFetch(tempNext)
-                    tempOld = tempNext
-                    binding.progressBar.visibility = View.VISIBLE
-                }
-                if (!recyclerView.canScrollVertically(-1)&&recyclerView.scrollState==0) {
-
-                    binding.progressBar.visibility = View.VISIBLE
-                    Controller.executeFetch(null)
-                    tempNext = null.toString()
-                    tempOld = null.toString()
-
-                }
-
-            }
-        })
-
-        binding.refreshButton.setOnClickListener {  //go to first page
-
-
-            Controller.executeFetch(null)
-            binding.progressBar.visibility = View.VISIBLE
-            binding.refreshButton.visibility = View.INVISIBLE
-
+            refresh()
 
         }
+
+        val layoutManager = LinearLayoutManager(this)
+        layoutManager.orientation = LinearLayoutManager.VERTICAL
+
+        binding.personList.layoutManager=layoutManager
+
+        var isLastPage: Boolean = false
+        var isLoading: Boolean = false
+
+        binding.personList.addOnScrollListener(object : PaginationScrollListener(layoutManager) {
+            override fun isLastPage(): Boolean {
+                Log.d(TAG, "isLastPage")
+                return isLastPage
+            }
+
+            override fun isLoading(): Boolean {
+                Log.d(TAG, "isLoading")
+                return isLoading
+            }
+
+            override fun loadMoreItems() {
+                isLoading = true
+                Log.d(TAG, "loadMoreItems")
+            }
+        })
 
 
     }
@@ -102,6 +86,7 @@ class MainActivity : AppCompatActivity(), ListUpdater {
     private fun recyclerViewAdapter(list: List<Person>) {  //list create or update
 
 
+        var size = people.size
         people.addAll(list)
 
         binding.personList.layoutManager =
@@ -110,7 +95,8 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
         binding.progressBar.visibility = View.INVISIBLE
 
-        binding.personList.scrollToPosition(people.size)
+        var sizeNew = people.size
+
 
 
     }
@@ -153,6 +139,30 @@ class MainActivity : AppCompatActivity(), ListUpdater {
         }
 
     }
+    fun scrollDown(){
+
+        binding.progressBar.visibility = View.VISIBLE
+        Controller.executeFetch(tempNext)
+        tempOld = tempNext
+        binding.progressBar.visibility = View.VISIBLE
+
+    }
+    fun scrollUp(){
+
+        binding.progressBar.visibility = View.VISIBLE
+        Controller.executeFetch(null)
+        tempNext = null.toString()
+        tempOld = null.toString()
+
+    }
+    fun refresh(){
+
+        Controller.executeFetch(null)
+        binding.progressBar.visibility = View.VISIBLE
+        binding.refreshButton.visibility = View.INVISIBLE
+    }
+
+
 
 
 }
