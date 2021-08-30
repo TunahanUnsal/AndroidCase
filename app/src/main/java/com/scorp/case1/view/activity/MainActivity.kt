@@ -25,6 +25,8 @@ class MainActivity : AppCompatActivity(), ListUpdater {
     private lateinit var tempNext: String
     private lateinit var tempOld: String
     private var people: MutableList<Person> = mutableListOf()
+    var isLastPage: Boolean = false
+    var isLoading: Boolean = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,17 +57,36 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
         }
 
-        val layoutManager = LinearLayoutManager(this)
-        layoutManager.orientation = LinearLayoutManager.VERTICAL
+    }
 
-        binding.personList.layoutManager=layoutManager
+    private fun recyclerViewAdapter(list: List<Person>) {  //list create or update
 
-        var isLastPage: Boolean = false
-        var isLoading: Boolean = false
+        var tempSize = people.size
 
-        binding.personList.addOnScrollListener(object : PaginationScrollListener(layoutManager) {
+        people.addAll(list)
+
+
+        binding.personList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        binding.personList.adapter = PersonAdapter(people)
+
+        binding.progressBar.visibility = View.INVISIBLE
+
+        Log.d(TAG, "people.size: "+people.size)
+        Log.d(TAG, "list.size: "+list.size)
+
+        if (list.size<=15){
+            binding.personList.scrollToPosition(people.size-16)
+        }
+        else{
+            binding.personList.scrollToPosition(people.size-list.size-1)
+        }
+
+
+
+        binding.personList.addOnScrollListener(object : PaginationScrollListener(binding.personList.layoutManager as LinearLayoutManager) {
             override fun isLastPage(): Boolean {
                 Log.d(TAG, "isLastPage")
+
                 return isLastPage
             }
 
@@ -75,33 +96,23 @@ class MainActivity : AppCompatActivity(), ListUpdater {
             }
 
             override fun loadMoreItems() {
-                isLoading = true
-                Log.d(TAG, "loadMoreItems")
+
+                if (!isLoading){
+                    Log.d(TAG, "loadMoreItems")
+                    scrollDown()
+                }
+
             }
         })
 
-
-    }
-
-    private fun recyclerViewAdapter(list: List<Person>) {  //list create or update
-
-
-        var size = people.size
-        people.addAll(list)
-
-        binding.personList.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        binding.personList.adapter = PersonAdapter(people)
-
-        binding.progressBar.visibility = View.INVISIBLE
-
-        var sizeNew = people.size
 
 
 
     }
 
     override fun listUpdate(list: List<Person>, next: String,error: String) { //list update interface
+
+
 
         Log.d(TAG, "listUpdate next -> $next")
         Log.d(TAG, "listUpdate error -> $error")
@@ -138,6 +149,7 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
         }
 
+        isLoading = false
     }
     fun scrollDown(){
 
@@ -145,6 +157,8 @@ class MainActivity : AppCompatActivity(), ListUpdater {
         Controller.executeFetch(tempNext)
         tempOld = tempNext
         binding.progressBar.visibility = View.VISIBLE
+        isLoading = true
+
 
     }
     fun scrollUp(){
