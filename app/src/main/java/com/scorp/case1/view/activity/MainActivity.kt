@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity(), ListUpdater {
     private var people: MutableList<Person> = mutableListOf()
     private var isLastPage: Boolean = false
     private var isLoading: Boolean = false
-    private var visibleItemCount = 0
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
 
 
-        binding.personList.addOnScrollListener(object :
+        binding.personList.addOnScrollListener(object :        //Scroll listener
             PaginationScrollListener(binding.personList.layoutManager as LinearLayoutManager) {
             override fun isLastPage(): Boolean {
                 Log.d(TAG, "isLastPage")
@@ -111,7 +111,7 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
     }
 
-    override fun listUpdate(                //list update interface
+    override fun listUpdate(   //list update interface
         list: List<Person>,
         next: String,
         error: String
