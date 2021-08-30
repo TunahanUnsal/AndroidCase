@@ -70,9 +70,16 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
             override fun onSwipeBottom() {
 
-                if (temp_old!="null"){
+                if (temp_hold!="null"){
 
                     Controller.executeFetch(temp_hold)
+                    binding.progressBar.visibility = View.VISIBLE
+                    binding.nextButton.visibility = View.INVISIBLE
+                    binding.prevButton.visibility = View.INVISIBLE
+                    Log.d(TAG, "onSwipeBottom")
+                }
+                else{
+                    Controller.executeFetch(null)
                     binding.progressBar.visibility = View.VISIBLE
                     binding.nextButton.visibility = View.INVISIBLE
                     binding.prevButton.visibility = View.INVISIBLE
