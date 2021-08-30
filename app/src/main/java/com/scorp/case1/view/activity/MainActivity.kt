@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.scorp.case1.model.Person
 import com.scorp.case1.viewModel.Controller
 import com.scorp.case1.viewModel.ListUpdater
@@ -19,10 +21,10 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
     private lateinit var binding: ActivityMainBinding  //view binding
     private var TAG: String = MainActivity::class.simpleName.toString()
-    private lateinit var temp_next: String
-    private lateinit var temp_hold: String
-    private lateinit var temp_old: String
-    private var flag: Boolean = false
+    private lateinit var tempNext: String
+    private lateinit var tempOld: String
+    private var people: MutableList<Person> = mutableListOf()
+    private var tuna : Int = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,9 +36,11 @@ class MainActivity : AppCompatActivity(), ListUpdater {
         listeners()
 
         Controller.executeFetch(null)
-        temp_old = null.toString()
-        temp_hold = null.toString()
-        temp_next = null.toString()
+
+        tempNext = null.toString()
+        tempOld = null.toString()
+
+
 
 
 
@@ -47,47 +51,39 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
         Controller.registerListUpdater(this)
 
-        binding.nextButton.setOnClickListener {   //next page
-
-            Controller.executeFetch(temp_next)
-
-            binding.progressBar.visibility = View.VISIBLE
-            binding.nextButton.visibility = View.INVISIBLE
-            binding.prevButton.visibility = View.INVISIBLE
-
-        }
-        binding.prevButton.setOnClickListener {   //next page
-
-            Controller.executeFetch(temp_old)
-            binding.progressBar.visibility = View.VISIBLE
-            binding.nextButton.visibility = View.INVISIBLE
-            binding.prevButton.visibility = View.INVISIBLE
-
-        }
-
 
         binding.personList.setOnTouchListener(object : OnSwipeTouchListener(applicationContext) {  //pull to refresh
 
             override fun onSwipeBottom() {
 
-                if (temp_hold!="null"){
 
-                    Controller.executeFetch(temp_hold)
-                    binding.progressBar.visibility = View.VISIBLE
-                    binding.nextButton.visibility = View.INVISIBLE
-                    binding.prevButton.visibility = View.INVISIBLE
-                    Log.d(TAG, "onSwipeBottom")
-                }
-                else{
-                    Controller.executeFetch(null)
-                    binding.progressBar.visibility = View.VISIBLE
-                    binding.nextButton.visibility = View.INVISIBLE
-                    binding.prevButton.visibility = View.INVISIBLE
-                    Log.d(TAG, "onSwipeBottom")
-                }
 
             }
 
+
+        })
+
+        binding.personList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+
+                if (!recyclerView.canScrollVertically(1) && recyclerView.scrollState==1) {
+                    binding.progressBar.visibility = View.VISIBLE
+                    tuna = recyclerView.scrollState
+                    Controller.executeFetch(tempNext)
+                    tempOld = tempNext
+                    binding.progressBar.visibility = View.VISIBLE
+                }
+                if (!recyclerView.canScrollVertically(-1)&&recyclerView.scrollState==0) {
+
+                    binding.progressBar.visibility = View.VISIBLE
+                    Controller.executeFetch(null)
+                    tempNext = null.toString()
+                    tempOld = null.toString()
+
+                }
+
+            }
         })
 
         binding.refreshButton.setOnClickListener {  //go to first page
@@ -96,8 +92,6 @@ class MainActivity : AppCompatActivity(), ListUpdater {
             Controller.executeFetch(null)
             binding.progressBar.visibility = View.VISIBLE
             binding.refreshButton.visibility = View.INVISIBLE
-            binding.nextButton.visibility = View.INVISIBLE
-            binding.prevButton.visibility = View.INVISIBLE
 
 
         }
@@ -107,11 +101,16 @@ class MainActivity : AppCompatActivity(), ListUpdater {
 
     private fun recyclerViewAdapter(list: List<Person>) {  //list create or update
 
+
+        people.addAll(list)
+
         binding.personList.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        binding.personList.adapter = PersonAdapter(list)
+        binding.personList.adapter = PersonAdapter(people)
 
         binding.progressBar.visibility = View.INVISIBLE
+
+        binding.personList.scrollToPosition(people.size)
 
 
     }
@@ -121,27 +120,22 @@ class MainActivity : AppCompatActivity(), ListUpdater {
         Log.d(TAG, "listUpdate next -> $next")
         Log.d(TAG, "listUpdate error -> $error")
 
-        val errorCode : Int = Controller.errorCodeWizard(error,temp_old)
+        val errorCode : Int = Controller.errorCodeWizard(error,tempOld)
 
         Log.d(TAG, "listUpdate error code -> $errorCode")
 
         if (errorCode == 0){
 
-
             if(next == "null"&& list.isNotEmpty()){
 
-                //binding.emptyText.visibility = View.VISIBLE
                 binding.refreshButton.visibility = View.VISIBLE
-                binding.nextButton.visibility = View.INVISIBLE
-                binding.prevButton.visibility = View.VISIBLE
                 recyclerViewAdapter(list)
             }
             else if (next == "null" && list.isEmpty()){
 
                 binding.emptyText.visibility = View.VISIBLE
                 binding.refreshButton.visibility = View.VISIBLE
-                binding.nextButton.visibility = View.INVISIBLE
-                binding.prevButton.visibility = View.VISIBLE
+
                 recyclerViewAdapter(list)
             }
 
@@ -150,16 +144,9 @@ class MainActivity : AppCompatActivity(), ListUpdater {
                 Log.d(TAG, "listUpdate next -> !null ")
                 binding.emptyText.visibility = View.INVISIBLE
                 binding.refreshButton.visibility = View.INVISIBLE
-                binding.nextButton.visibility = View.VISIBLE
-                if (flag){
-                    binding.prevButton.visibility = View.VISIBLE
-                }
-                temp_old = temp_hold
-                temp_hold = temp_next
-                temp_next = next
-                Log.d(TAG, "listUpdate: $temp_old - $temp_hold - $temp_next")
+                tempNext = next
                 recyclerViewAdapter(list)
-                flag = true
+
             }
 
 
